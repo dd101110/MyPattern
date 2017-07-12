@@ -9,9 +9,10 @@ import com.yibin.mypattern.utils.ImageLoader;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String IMG_URL = "https://m.360buyimg.com/live/jfs/t6073/305/4292747561/187253/897fc238/5961e051Nec2387b5.jpg!q70.jpg.webp";
+    public static final String IMG_URL = "http://car2.autoimg.cn/cardfs/product/g19/M0C/CE/71/1024x0_1_q87_autohomecar__wKjBxFekCjSAPXRuAAIDA2tihQs156.jpg";
 
     private ImageView image;
+    private ImageLoader mLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +24,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void displayImage() {
-        ImageLoader imageLoader = new ImageLoader(image);
-        imageLoader.displayImg(IMG_URL);
+        if (null == mLoader) mLoader = new ImageLoader(image);
+        mLoader.displayImg(IMG_URL);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        displayImage();
     }
 }

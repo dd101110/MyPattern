@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
-import android.util.LruCache;
 import android.widget.ImageView;
 
 import java.net.HttpURLConnection;
@@ -23,12 +22,12 @@ public class ImageLoader {
 
     public static final int MSG_OK = 1;
 
-    private LruCache<String,Bitmap> mCache;
-
     private ExecutorService mExecutorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     private ImageView imageView;
     private Bitmap bitmap;
+
+    private ImageCache mCache = new ImageCache();
 
     private Handler handler = new Handler() {
         @Override
@@ -41,22 +40,8 @@ public class ImageLoader {
 
     public ImageLoader(ImageView imageView) {
         this.imageView = imageView;
-        initCache();
     }
 
-    /**
-     * 初始化图片缓存容器
-     */
-    private void initCache() {
-        int maxMemory = (int) Runtime.getRuntime().maxMemory();
-        int cacheSize = maxMemory / 4;
-        mCache = new LruCache<String, Bitmap>(cacheSize) {
-            @Override
-            protected int sizeOf(String key, Bitmap value) {
-                return value.getRowBytes() * value.getHeight() / 1024;
-            }
-        };
-    }
 
     /**
      * 根据url下载图片
@@ -83,6 +68,11 @@ public class ImageLoader {
      * @param imgUrl 图片url
      */
     public void displayImg(final String imgUrl) {
+        bitmap = mCache.get(imgUrl);
+        if (null != bitmap) {
+            imageView.setImageBitmap(bitmap);
+            return;
+        }
         imageView.setTag(imgUrl);
         try {
             mExecutorService.submit(new Runnable() {
@@ -91,8 +81,7 @@ public class ImageLoader {
                     bitmap = downloadImg(imgUrl);
                     if (null == bitmap) return;
                     if (imageView.getTag().equals(imgUrl)) {
-                        imageView.setImageBitmap(bitmap);
-    //                    handler.sendEmptyMessage(MSG_OK);
+                        handler.sendEmptyMessage(MSG_OK);
                         mCache.put(imgUrl,bitmap);
                     }
                 }
