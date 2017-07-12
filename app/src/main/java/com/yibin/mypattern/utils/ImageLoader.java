@@ -27,7 +27,7 @@ public class ImageLoader {
     private ImageView imageView;
     private Bitmap bitmap;
 
-    private ImageCache mCache = new ImageCache();
+    private ImageCacheInterface mCache;
 
     private Handler handler = new Handler() {
         @Override
@@ -73,6 +73,10 @@ public class ImageLoader {
             imageView.setImageBitmap(bitmap);
             return;
         }
+        requestImg(imgUrl);
+    }
+
+    private void requestImg(final String imgUrl) {
         imageView.setTag(imgUrl);
         try {
             mExecutorService.submit(new Runnable() {
@@ -91,5 +95,9 @@ public class ImageLoader {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setmCache(ImageCacheInterface mCache) {
+        this.mCache = mCache;
     }
 }

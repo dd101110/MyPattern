@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.ImageView;
 
 import com.yibin.mypattern.R;
+import com.yibin.mypattern.utils.DoubleCache;
 import com.yibin.mypattern.utils.ImageLoader;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void displayImage() {
         if (null == mLoader) mLoader = new ImageLoader(image);
+        mLoader.setmCache(new DoubleCache());
         mLoader.displayImg(IMG_URL);
     }
 
